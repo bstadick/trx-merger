@@ -8,7 +8,7 @@ namespace TRX_Merger.Utilities
 {
     public static class TRXSerializationUtils
     {
-        private static string ns = "{http://microsoft.com/schemas/VisualStudio/TeamTest/2010}";
+        private static string _ns = "{http://microsoft.com/schemas/VisualStudio/TeamTest/2010}";
 
         #region Serializers
         internal static string SerializeAndSaveTestRun(TestRun testRun, string targetPath)
@@ -100,7 +100,7 @@ namespace TRX_Merger.Utilities
                 );
 
 
-            doc.Root.SetDefaultXmlNamespace("http://microsoft.com/schemas/VisualStudio/TeamTest/2010");
+            doc.Root.SetDefaultXmlNamespace(xmlns);
 
             if (File.Exists(targetPath))
                 File.Delete(targetPath);
@@ -123,16 +123,16 @@ namespace TRX_Merger.Utilities
                 XDocument doc = XDocument.Load(trxStream);
                 var run = doc.Root;
 
-                testRun.Id = run.Attribute("id").Value;
-                testRun.Name = run.Attribute("name").Value;
-                testRun.RunUser = run.Attribute("runUser").Value;
+                testRun.Id = run?.Attribute("id")?.Value;
+                testRun.Name = run?.Attribute("name")?.Value;
+                testRun.RunUser = run?.Attribute("runUser")?.Value;
 
-                testRun.Times = DeserializeTimes(doc.Descendants(ns + "Times").FirstOrDefault());
-                testRun.Results = DeserializeResults(doc.Descendants(ns + "UnitTestResult"));
-                testRun.TestDefinitions = DeserializeTestDefinitions(doc.Descendants(ns + "UnitTest"));
-                testRun.TestEntries = DeserializeTestEntries(doc.Descendants(ns + "TestEntry"));
-                testRun.TestLists = DeserializeTestLists(doc.Descendants(ns + "TestList"));
-                testRun.ResultSummary = DeserializeResultSummary(doc.Descendants(ns + "ResultSummary").FirstOrDefault());
+                testRun.Times = DeserializeTimes(doc.Descendants(_ns + "Times").FirstOrDefault());
+                testRun.Results = DeserializeResults(doc.Descendants(_ns + "UnitTestResult"));
+                testRun.TestDefinitions = DeserializeTestDefinitions(doc.Descendants(_ns + "UnitTest"));
+                testRun.TestEntries = DeserializeTestEntries(doc.Descendants(_ns + "TestEntry"));
+                testRun.TestLists = DeserializeTestLists(doc.Descendants(_ns + "TestList"));
+                testRun.ResultSummary = DeserializeResultSummary(doc.Descendants(_ns + "ResultSummary").FirstOrDefault());
             }
             return testRun;
         }
@@ -143,7 +143,7 @@ namespace TRX_Merger.Utilities
             {
                 Outcome = resultSummary.GetAttributeValue("outcome"),
                 Counters = DeserializeCounters(resultSummary),
-                RunInfos = DeserializeRunInfos(resultSummary.Descendants(ns + "RunInfo"))
+                RunInfos = DeserializeRunInfos(resultSummary.Descendants(_ns + "RunInfo"))
             };
 
             return res;
@@ -172,7 +172,7 @@ namespace TRX_Merger.Utilities
 
         private static string DeserializeText(XElement rf)
         {
-            var txt = rf.Descendants(ns + "Text").FirstOrDefault();
+            var txt = rf.Descendants(_ns + "Text").FirstOrDefault();
             if (txt == null)
                 return null;
 
@@ -181,7 +181,7 @@ namespace TRX_Merger.Utilities
 
         private static Counters DeserializeCounters(XElement resultSummary)
         {
-            var cc = resultSummary.Descendants(ns + "Counters").FirstOrDefault();
+            var cc = resultSummary.Descendants(_ns + "Counters").FirstOrDefault();
             if (cc == null)
                 return null;
 
@@ -252,16 +252,16 @@ namespace TRX_Merger.Utilities
                 var name = def.GetAttributeValue("name");
                 var storage = def.GetAttributeValue("storage");
                 var id = def.GetAttributeValue("id");
-                var Execution = DeserializeExecution(def);
-                var TestMethod = DeserializeTestMethod(def);
+                var execution = DeserializeExecution(def);
+                var testMethod = DeserializeTestMethod(def);
 
                 result.Add(new UnitTest
                 {
                     Id = id,
                     Name = name,
                     Storage = storage,
-                    Execution = Execution,
-                    TestMethod = TestMethod
+                    Execution = execution,
+                    TestMethod = testMethod
                 });
 
             }
@@ -271,7 +271,7 @@ namespace TRX_Merger.Utilities
 
         private static Execution DeserializeExecution(XElement unitTest)
         {
-            var exec = unitTest.Descendants(ns + "Execution").FirstOrDefault();
+            var exec = unitTest.Descendants(_ns + "Execution").FirstOrDefault();
             if (exec == null)
                 return null;
 
@@ -283,7 +283,7 @@ namespace TRX_Merger.Utilities
 
         private static TestMethod DeserializeTestMethod(XElement unitTest)
         {
-            var tm = unitTest.Descendants(ns + "TestMethod").FirstOrDefault();
+            var tm = unitTest.Descendants(_ns + "TestMethod").FirstOrDefault();
             if (tm == null)
                 return null;
 
@@ -314,7 +314,7 @@ namespace TRX_Merger.Utilities
                 var testListId = res.GetAttributeValue("testListId");
                 var testName = res.GetAttributeValue("testName");
                 var testType = res.GetAttributeValue("testType");
-                var Output = new UnitTestResultOutput
+                var output = new UnitTestResultOutput
                 {
                     StdOut = DeserializeStdOut(res),
                     StdErr = DeserializeStdErr(res),
@@ -327,7 +327,7 @@ namespace TRX_Merger.Utilities
                     EndTime = endTime,
                     ExecutionId = executionId,
                     Outcome = outcome,
-                    Output = Output,
+                    Output = output,
                     RelativeResultsDirectory = relativeResultsDirectory,
                     StartTime = startTime,
                     TestId = testId,
@@ -342,20 +342,20 @@ namespace TRX_Merger.Utilities
 
         private static ErrorInfo DeserializeErrorInfo(XElement unitTestResult)
         {
-            var err = unitTestResult.Descendants(ns + "ErrorInfo").FirstOrDefault();
+            var err = unitTestResult.Descendants(_ns + "ErrorInfo").FirstOrDefault();
             if (err == null)
                 return null;
 
             return new ErrorInfo
             {
-                Message = err.Descendants(ns + "Message").FirstOrDefault().Value,
-                StackTrace = err.Descendants(ns + "StackTrace").FirstOrDefault()?.Value,
+                Message = err.Descendants(_ns + "Message").FirstOrDefault()?.Value,
+                StackTrace = err.Descendants(_ns + "StackTrace").FirstOrDefault()?.Value,
             };
         }
 
         private static string DeserializeStdOut(XElement unitTestResult)
         {
-            var stdOut = unitTestResult.Descendants(ns + "StdOut").FirstOrDefault();
+            var stdOut = unitTestResult.Descendants(_ns + "StdOut").FirstOrDefault();
             if (stdOut == null)
                 return null;
 
@@ -364,7 +364,7 @@ namespace TRX_Merger.Utilities
 
         private static string DeserializeStdErr(XElement unitTestResult)
         {
-            var stdErr = unitTestResult.Descendants(ns + "StdErr").FirstOrDefault();
+            var stdErr = unitTestResult.Descendants(_ns + "StdErr").FirstOrDefault();
             if (stdErr == null)
                 return null;
 
@@ -375,10 +375,10 @@ namespace TRX_Merger.Utilities
         {
             return new Times
             {
-                Creation = xElement.Attribute("creation").Value,
-                Finish = xElement.Attribute("finish").Value,
-                Queuing = xElement.Attribute("queuing").Value,
-                Start = xElement.Attribute("start").Value,
+                Creation = xElement.Attribute("creation")?.Value,
+                Finish = xElement.Attribute("finish")?.Value,
+                Queuing = xElement.Attribute("queuing")?.Value,
+                Start = xElement.Attribute("start")?.Value,
             };
         }
         #endregion

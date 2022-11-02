@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web.Mvc;
+using System.Text.Json;
 using TRX_Merger.TrxModel;
 
 namespace TRX_Merger.ReportModel
-{
+{   
     public class TestRunReport
     {
         public TestRunReport(TestRun run)
@@ -18,53 +15,53 @@ namespace TRX_Merger.ReportModel
 
         public TestRun Run { get; set; }
 
-        private List<string> testClasses;
+        private List<string> _testClasses;
         public List<string> TestClasses 
         { 
             get
             {
-                if(testClasses == null)
-                    testClasses = Run.TestDefinitions.Select(td => td.TestMethod.ClassName).Distinct().ToList<string>();
-                return testClasses;
+                if(_testClasses == null)
+                    _testClasses = Run.TestDefinitions.Select(td => td.TestMethod.ClassName).Distinct().ToList();
+                return _testClasses;
             }
         }
 
-        private List<UnitTestResultReport> allFailedTests;
+        private List<UnitTestResultReport> _allFailedTests;
         public List<UnitTestResultReport> AllFailedTests
         {
             get
             {
-                if (allFailedTests == null)
+                if (_allFailedTests == null)
                 {
-                    allFailedTests = new List<UnitTestResultReport>();
+                    _allFailedTests = new List<UnitTestResultReport>();
                     TestClassReports.ToList().ForEach(
                         t =>
-                            allFailedTests.AddRange(t.Value.Tests.Where(r => r.Result.Outcome != "Passed").ToList())); 
+                            _allFailedTests.AddRange(t.Value.Tests.Where(r => r.Result.Outcome != "Passed").ToList())); 
                 }
-                return allFailedTests;
+                return _allFailedTests;
             }
         }
 
-        private Dictionary<string, TestClassReport> testClassReports;
+        private Dictionary<string, TestClassReport> _testClassReports;
         public Dictionary<string, TestClassReport> TestClassReports
         {
             get
             {
-                if(testClassReports == null)
+                if(_testClassReports == null)
                 {
-                    testClassReports = new Dictionary<string, TestClassReport>();
+                    _testClassReports = new Dictionary<string, TestClassReport>();
                     foreach (var testClass in TestClasses)
                     {
-                        testClassReports.Add(testClass, GetTestClassReport(testClass));
+                        _testClassReports.Add(testClass, GetTestClassReport(testClass));
                     }
                 }
 
-                return testClassReports;
+                return _testClassReports;
             }
         }
         public string TestClassReportsJson()
         {
-            var test =  System.Web.Helpers.Json.Encode(TestClassReports.Select(s => s.Value).Select(
+            var test =  JsonSerializer.Serialize(TestClassReports.Select(s => s.Value).Select(
                 c => 
                     new 
                     { 
@@ -91,7 +88,7 @@ namespace TRX_Merger.ReportModel
                     new UnitTestResultReport(r)
                     { 
                         ClassName = className,
-                        Dll = Run.TestDefinitions.Where(d => d.Name == r.TestName).FirstOrDefault().TestMethod.CodeBase
+                        Dll = Run.TestDefinitions.Where(d => d.Name == r.TestName).FirstOrDefault()?.TestMethod.CodeBase
                     });
             }
 

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 
 namespace TRX_Merger.ReportModel
 {
@@ -23,11 +22,12 @@ namespace TRX_Merger.ReportModel
 
             Timeout = tests.Count(t => t.Result.Outcome == "Timeout");
 
-            var durations = tests.Select(t => TimeSpan.Parse(t.Result.Duration)).ToList<TimeSpan>();
+            var durations = tests.Select(t => TimeSpan.Parse(t.Result.Duration)).ToList();
             Duration = new TimeSpan();
             durations.ForEach(d => Duration += d);
 
-            Dll = tests[0].Dll;
+            if (tests.Count > 0)
+                Dll = tests[0].Dll;
         }
 
         public string TestClassName { get; set; }
@@ -35,7 +35,7 @@ namespace TRX_Merger.ReportModel
         {
             get
             {
-                return TestClassName.Split(new char[] { '.' }).Last();
+                return TestClassName.Split(new[] { '.' }).Last();
             }         
         }
 
