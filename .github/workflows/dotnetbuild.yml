@@ -8,6 +8,13 @@ on:
         type: string
         required: false
         default: Release
+  workflow_dispatch:
+    inputs:
+      build-configuration:
+        description: 'The build configuration. If omitted, Release is built.'
+        type: string
+        required: false
+        default: Release
 
 env:
   REPO_URL: ${{ github.server_url }}/${{ github.repository }}
