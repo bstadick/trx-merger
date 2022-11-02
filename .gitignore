@@ -5,6 +5,8 @@
 *.suo
 *.user
 *.sln.docstates
+.vs
+.config
 
 # Build results
 [Dd]ebug/
@@ -15,7 +17,6 @@ build/
 bld/
 [Bb]in/
 [Oo]bj/
-[Oo]bj/**
 
 # Roslyn cache directories
 *.ide/
@@ -57,6 +58,7 @@ dlldata.c
 *.pidb
 *.svclog
 *.scc
+*.csproj.bak
 
 # Chutzpah Test files
 _Chutzpah*
@@ -188,5 +190,13 @@ FakesAssemblies/
 GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
-packages/*
-Web/Content/bower_components/*
+
+# Cake tools
+.dotnet
+tools/*
+
+# NuGet restore
+*project.lock.json
+
+# Android Xamarin
+Resource.Designer.cs

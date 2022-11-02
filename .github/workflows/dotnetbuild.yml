@@ -1,0 +1,44 @@
+name: .NET Core Build
+description: 'Gets, Builds, Tests, Packs, and Deploys a .NET Core solution.'
+
+on:
+  workflow_call:
+
+env:
+  REPO_URL: ${{ github.server_url }}/${{ github.repository }}
+
+inputs:
+  build-configuration:
+    description: 'The build configuration. If omitted, Release is built.'
+    required: false
+    default: Release
+
+jobs:
+  netcore_build:
+    name: .NET Core Build
+    runs-on: windows-latest
+    steps:
+    # Checkout code
+    - name: Checkout
+      uses: actions/checkout@v3
+    # Configure .NET Core
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 3.1.x
+    # Build
+    - name: Build with dotnet
+      run: dotnet build --configuration ${{ inputs.build-configuration }} -p:RepositoryUrl=${{ env.REPO_URL }} -p:PackageProjectUrl=${{ env.REPO_URL }}
+    # Test
+    - name: Test with dotnet
+      run: dotnet test --configuration ${{ inputs.build-configuration }}
+    # Package
+    - name: Pack with dotnet
+      run: dotnet pack --configuration ${{ inputs.build-configuration }} -p:RepositoryUrl=${{ env.REPO_URL }} -p:PackageProjectUrl=${{ env.REPO_URL }}
+    # Upload build output
+    - name: Upload nuget artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: nuget-build-output
+        path: **\${{ inputs.build-configuration }}\*.nupkg
+        retention-days: 1

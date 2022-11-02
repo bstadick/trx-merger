@@ -1,0 +1,23 @@
+name: .NET Core Push Build
+description: 'Builds and Tests the solution on a push to a stable branch of the repository.'
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'master'
+      - 'develop'
+      - 'releases/**'
+
+inputs:
+  build-configuration:
+    description: 'The build configuration. If omitted, Release is built.'
+    required: false
+    default: Release
+
+jobs:
+  push_build:
+    name: Build on push
+    uses: ./.github/workflows/dotnetbuild.yml
+    with:
+      build-configuration: ${{ inputs.build-configuration }}

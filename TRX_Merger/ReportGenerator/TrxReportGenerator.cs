@@ -1,11 +1,7 @@
 ﻿using RazorEngine;
 using RazorEngine.Templating;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TRX_Merger.ReportModel;
 using TRX_Merger.TrxModel;
 using TRX_Merger.Utilities;
@@ -26,8 +22,7 @@ namespace TRX_Merger.ReportGenerator
             if (!string.IsNullOrEmpty(reportTitle))
                 run.Name = reportTitle;
 
-            Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
-            string template = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ReportGenerator/trx_report_template.html"));
+            string template = HelperMethods.GetEmbeddedResource("trx_report_template.html");
 
             string result = Engine.Razor.RunCompile(
                 template,

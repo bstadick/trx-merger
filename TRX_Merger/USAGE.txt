@@ -1,0 +1,46 @@
+﻿trx-merger -- A utility to merge and generate HTML reports from TRX unit test result files.
+
+Parameters:
+
+ /trx:<paths>          [REQUIRED]
+                       Path to either a trx file or directory containing trx files to be merged.
+                       This parameter will accept one of the following:
+
+                       - File(s) name: Looks for trx files in the current directory. File extension is required.
+                       example: /trx:testResults1.trx,testResults2.trx,testResults3.trx
+
+                       - File(s) path: Full path to trx files. File extension is required.
+                       example: /trx:C:\TestResults\testResults1.trx,C:\TestResults\testResults2.trx,C:\TestResults\testResults3.trx
+
+                       - directory(s): Directory containing trx files. It gets all trx files in the directory.
+                       example: /trx:C:\TestResults,C:\TestResults1
+
+                       - Empty: Gets all trx files in the current directory.
+                       example: /trx
+
+                       - Combination: You can pass files and directories at the same time.
+                       example: /trx:C:\TestResults,C:\TestResults1\testResults2.trx
+
+ /output:<path>        [REQUIRED] if more than one trx file is defined in the /trx parameter, otherwise should not be passed.
+                       The path of the output trx file and extension.
+
+                       example: /output:combinedTestResults.trx
+                       example: /output:C:\TestResults\combinedTestResults.trx
+
+  /report:<path>       [REQUIRED] if one trx is specified in /trx parameter and [OPTIONAL] otherwise.
+                       Generates a html report from a trx file.
+                       - If one trx is passed to the utility, the report is for the trx file, otherwise the report is generated for the /output result.
+                       - Path is to where the report should be saved, including the name of the file and extension. 
+
+                       example /report:C:\Tests\report.html
+
+  /r                   [OPTIONAL]
+                       Recursive search in directories.
+                       - When there is a directory in /trx param (ex: /trx:C:\TestResults),
+                         and this parameter is passed, the search for trx files will be recursive.
+
+                       example: /trx:C:\TestResults,C:\TestResults1\testResults2.trx /r /output:combinedTestResults.trx
+
+  /screenshots:<path>  [OPTIONAL]
+                       Path to a folder which contains screenshots corresponding to failing tests.
+                       - In order for a screenshot to be shown in the report for a given test, the screenshot should contain the name of the test method.
