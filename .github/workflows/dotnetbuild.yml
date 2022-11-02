@@ -12,9 +12,12 @@ on:
     inputs:
       build-configuration:
         description: 'The build configuration. If omitted, Release is built.'
-        type: string
+        type: choice
         required: false
         default: Release
+        options:
+        - Release
+        - Debug
 
 env:
   REPO_URL: ${{ github.server_url }}/${{ github.repository }}
