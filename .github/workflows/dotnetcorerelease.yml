@@ -25,12 +25,12 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: nuget-build-output
-        path: ${{ env.DEPLOY_DIR }}
+        path: .\${{ env.DEPLOY_DIR }}
     # Attach build output to release
     - name: Attach nuget to release
       uses: softprops/action-gh-release@v1
       with:
-        files: ${{ env.DEPLOY_DIR }}\*.nupkg
+        files: .\${{ env.DEPLOY_DIR }}\*.nupkg
     # Publish build output
     - name: Deploy to GitHub Package Repository with dotnet
       run: |
