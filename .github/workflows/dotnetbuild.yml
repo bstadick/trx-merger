@@ -1,17 +1,16 @@
 name: .NET Core Build
-description: 'Gets, Builds, Tests, Packs, and Deploys a .NET Core solution.'
 
 on:
   workflow_call:
+    inputs:
+      build-configuration:
+        description: 'The build configuration. If omitted, Release is built.'
+        type: string
+        required: false
+        default: Release
 
 env:
   REPO_URL: ${{ github.server_url }}/${{ github.repository }}
-
-inputs:
-  build-configuration:
-    description: 'The build configuration. If omitted, Release is built.'
-    required: false
-    default: Release
 
 jobs:
   netcore_build:
@@ -40,5 +39,5 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: nuget-build-output
-        path: **\${{ inputs.build-configuration }}\*.nupkg
+        path: .\**\${{ inputs.build-configuration }}\*.nupkg
         retention-days: 1
