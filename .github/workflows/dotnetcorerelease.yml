@@ -1,5 +1,4 @@
 name: .NET Core Release Publish
-description: 'Buillds, Tests, and Releases on a repository release publish.'
 
 on:
   release:
@@ -7,19 +6,14 @@ on:
 
 env:
   GITHUB_NUGET_URL: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
-
-inputs:
-  build-configuration:
-    description: 'The build configuration. If omitted, Release is built.'
-    required: false
-    default: Release
+  DEPLOY_DIR: publish_${{ github.run_number }}_${{ github.run_attempt }}
 
 jobs:
   release_build:
     name: Build on release
     uses: ./.github/workflows/dotnetbuild.yml
     with:
-      build-configuration: ${{ inputs.build-configuration }}
+      build-configuration: Release
 
   release_publish:
     name: Publish on release
@@ -31,14 +25,14 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: nuget-build-output
-        path: deploy
+        path: ${{ env.DEPLOY_DIR }}
     # Attach build output to release
     - name: Attach nuget to release
       uses: softprops/action-gh-release@v1
-        with:
-          files: deploy\*.nupkg
+      with:
+        files: ${{ env.DEPLOY_DIR }}\*.nupkg
     # Publish build output
     - name: Deploy to GitHub Package Repository with dotnet
       run: |
         dotnet nuget add source ${{ env.GITHUB_NUGET_URL }} --name github --username ${{ github.repository_owner }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
-        dotnet nuget push ".\deploy\*.nupkg" --source "github" --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
+        dotnet nuget push ".\${{ env.DEPLOY_DIR }}\*.nupkg" --source "github" --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
