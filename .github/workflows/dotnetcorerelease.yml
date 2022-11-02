@@ -30,9 +30,9 @@ jobs:
     - name: Attach nuget to release
       uses: softprops/action-gh-release@v1
       with:
-        files: .\${{ env.DEPLOY_DIR }}\*.nupkg
+        files: .\${{ env.DEPLOY_DIR }}\**\*.nupkg
     # Publish build output
     - name: Deploy to GitHub Package Repository with dotnet
       run: |
         dotnet nuget add source ${{ env.GITHUB_NUGET_URL }} --name github --username ${{ github.repository_owner }} --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
-        dotnet nuget push ".\${{ env.DEPLOY_DIR }}\*.nupkg" --source "github" --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
+        dotnet nuget push ".\${{ env.DEPLOY_DIR }}\**\*.nupkg" --source "github" --api-key ${{ secrets.GITHUB_TOKEN }} --skip-duplicate
